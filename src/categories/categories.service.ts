@@ -21,19 +21,8 @@ export class CategoriesService {
         this._logger.log(`Assign player to categorie.`);
         const playersAssigned: Array<String> = [];
 
-        // Verify ID of categorie
-        if (!this.isValidObjectId(_id)) {
-            this._logger.warn(`Invalid categorie ID: ${_id}`);
-            throw new BadRequestException(`Invalid categorie ID: ${_id}`);
-        }
-
         // Verify each player ID and if the player exists
         for (const player of assignPlayers) {
-            console.log("uepora", player._id)
-            if (!this.isValidObjectId(player._id)) {
-                this._logger.warn(`Invalid player ID: ${player._id}`);
-                throw new BadRequestException(`Invalid player ID: ${player._id}`);
-            }
 
             await this.playersService.consultPlayerForId(player._id);
  
@@ -76,11 +65,6 @@ export class CategoriesService {
         const { _id, categorie } = updateCategorieDto;
         this._logger.log(`Updating categorie with ID: ${_id}`);
 
-        if (!this.isValidObjectId(_id)) {
-            this._logger.warn(`Invalid categorie ID: ${_id}`);
-            throw new BadRequestException(`Invalid categorie ID: ${_id}`);
-        }
-
         const categorieFound = await this.categorieModel.findOne({ _id }).exec();
 
         if(!categorieFound) {
@@ -103,10 +87,21 @@ export class CategoriesService {
         return await this.categorieModel.find().populate("players").exec();
     }
 
-    async consultCategorieForId(_id: string) : Promise<ICategorie> {
-        if (!this.isValidObjectId(_id)) {
-            throw new BadRequestException(`Invalid categorie ID: ${_id}`);
+    async consultCategoriaForPlayer(_id: string) : Promise<ICategorie> {
+
+        const players = await this.playersService.consultAllPlayers()
+
+        const playersFilter = players.filter( player => player._id == _id);
+
+        if( playersFilter.length == 0) {
+            throw new BadRequestException(`The Id ${_id}, is not a player`);
         }
+
+
+        return await this.categorieModel.findOne().where("players").in([_id]).exec();
+    }
+
+    async consultCategorieForId(_id: string) : Promise<ICategorie> {
 
         const categorieFound = await this.categorieModel.findOne({ _id }).populate("players").exec();
 
@@ -118,9 +113,6 @@ export class CategoriesService {
     }
 
     async deleteCategorie(_id: string) : Promise<any> {
-        if (!this.isValidObjectId(_id)) {
-            throw new BadRequestException(`Invalid categorie ID: ${_id}`);
-        }
 
         const categorieFound = await this.categorieModel.findOne({ _id }).exec();
 
@@ -128,11 +120,6 @@ export class CategoriesService {
             throw new NotFoundException(`Categorie with id: ${_id}, not found`);
         }
         return await this.categorieModel.deleteOne({ _id }).exec();
-    }
-
-    // Private Functions
-    private isValidObjectId(id: string): boolean {
-        return Types.ObjectId.isValid(id);
     }
 
     private async checkIfValueExists(field: string, value: any): Promise<void> {

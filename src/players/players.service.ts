@@ -29,11 +29,6 @@ export class PlayersService {
         const { _id, email, phoneNumber } = updatePlayerDto;
         this._logger.log(`Updating player with ID: ${_id}`);
 
-        if (!this.isValidObjectId(_id)) {
-            this._logger.warn(`Invalid player ID: ${_id}`);
-            throw new BadRequestException(`Invalid player ID: ${_id}`);
-        }
-
         const playerFound = await this.playerModel.findOne({ _id }).exec();
 
         if (!playerFound) {
@@ -57,9 +52,6 @@ export class PlayersService {
     }
 
     async deletePlayer(_id: string): Promise<any> {
-        if (this.isValidObjectId(_id)) {
-            throw new BadRequestException(`Invalid player ID: ${_id}`);
-        }
 
         const playerFound = await this.playerModel.findOne({ _id }).exec();
 
@@ -71,10 +63,6 @@ export class PlayersService {
     }
 
     async consultPlayerForId(_id: string): Promise<IPlayer> {
-        console.log(_id)
-        if (!this.isValidObjectId(_id)) {
-            throw new BadRequestException(`Invalid player ID: ${_id}`);
-        }
 
         const playerFound = await this.playerModel.findOne({ _id }).exec();
 
@@ -88,13 +76,6 @@ export class PlayersService {
     async consultAllPlayers(): Promise<IPlayer[]> {
         this._logger.log('Consulting all players');
         return await this.playerModel.find().exec();
-    }
-
-
-
-    // Private functions
-    private isValidObjectId(id: string): boolean {
-        return Types.ObjectId.isValid(id);
     }
 
     private async checkIfValueExists(field: string, value: any): Promise<void> {

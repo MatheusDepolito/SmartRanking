@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Put, UsePipes, ValidationPipe } from '@nes
 import { CreateCategorieDto } from './dtos/create-categorie.dto';
 import { ICategorie } from './interfaces/categorie.interface';
 import { CategoriesService } from './categories.service';
-import { CategoriesValidationParametersPipe } from './pipes/categories-validation-parameters.pipe';
+import { ValidationParametersPipe } from '../common/pipes/validation-parameters.pipe';
 import { UpdateCategorieDto } from './dtos/update-categorie.dto';
 import { AssignPlayersToCategorieDto } from './dtos/assign-players-to-categorie.dto';
 
@@ -39,7 +39,7 @@ export class CategoriesController {
     }
 
     @Get('/consultCategorieForId')
-    async consultCategorieForId(@Body('_id', CategoriesValidationParametersPipe) _id: string) : Promise<ICategorie> {
+    async consultCategorieForId(@Body('_id', ValidationParametersPipe) _id: string) : Promise<ICategorie> {
         return await this.categoriesService.consultCategorieForId(_id)
     }
 

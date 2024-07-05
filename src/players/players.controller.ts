@@ -1,4 +1,4 @@
-import { PlayersValidationParametersPipe } from './pipes/players-validation-parameters.pipe';
+import { ValidationParametersPipe } from '../common/pipes/validation-parameters.pipe';
 import { Body, Controller, Delete, Get, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreatePlayerDto } from './dtos/create-player.dto';
 import { PlayersService } from './players.service';
@@ -29,12 +29,12 @@ export class PlayersController {
     }
 
     @Get('/consultPlayerForId')
-    async consultPlayerForId(@Body('_id', PlayersValidationParametersPipe) _id: string) : Promise<IPlayer> {
+    async consultPlayerForId(@Body('_id', ValidationParametersPipe) _id: string) : Promise<IPlayer> {
         return await this.playersService.consultPlayerForId(_id);
     }
 
     @Delete()
-    async deletePlayer(@Body('_id', PlayersValidationParametersPipe) _id: string): Promise<void> {
+    async deletePlayer(@Body('_id', ValidationParametersPipe) _id: string): Promise<void> {
         return this.playersService.deletePlayer(_id);
 
     }
